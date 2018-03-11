@@ -1,0 +1,5 @@
+fh = input('Read which file? ')
+file_handle = open(fh, 'r')
+content = file_handle.read()
+print(content)
+file_handle.close()
