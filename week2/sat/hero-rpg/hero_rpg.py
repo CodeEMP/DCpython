@@ -4,14 +4,13 @@ class Weapon:
         self.name = name
         self.weapdmgmin = weapdmgmin
         self.weapdmgmax = weapdmgmax
-    def damage(self):
-        pass
         
 class Character:
-    def __init__(self, name, hp,):
+    def __init__(self, name, hp, weapon):
         self.name = name
         self.hp = hp
         self.maxhp = hp
+        self.weapon = weapon
     def alive(self):
         if self.hp < 1:
             return False
@@ -19,10 +18,13 @@ class Character:
             return True
     def check_status(self):
         print('{} has {} health left.'.format(self.name, self.hp))
-
+    def attack(self):
+        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
+        print('{} attacks with it\'s {}, dealing {} damage.'.format(self.name, self.weapon.name, dmg))
+        return dmg
+        
 class Hero(Character):
     potions = 3
-    weapon = Weapon('Sword', 3, 5)
     def attack(self):
         dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
         print('You attack with your {}, dealing {} damage.'.format(self.weapon.name, dmg))
@@ -43,53 +45,53 @@ class Hero(Character):
                 pass
 
 class Goblin(Character):
+    def __init__(self, name, hp, weapon):
+        self.hurt = 'The goblin is looking injured.'
+        self.unhurt = 'The goblin seems to be in good health.'
+        super().__init__(name, hp, weapon)
+    
     def check_status(self):
         if self.hp/self.maxhp * 100 <= 50:
-            print('The goblin is looking injured.')
+            print(self.hurt)
         else:
-            print('The goblin seems to be in good health.')
-    weapon = Weapon('Dagger', 1, 2)
-    def attack(self):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
-        print('The Goblin attacks with his {}, dealing {} damage.'.format(self.weapon.name, dmg))
-        return dmg
-
+            print(self.unhurt)
+            
 class Zombie(Character):
+    def __init__(self, name, hp, weapon):
+        self.hurt = 'The zombie is looking more corpsey.'
+        self.unhurt = 'The zombie shambles energetically.'
+        super().__init__(name, hp, weapon)
+    
     def check_status(self):
         if self.hp/self.maxhp * 100 <= 50:
-            print('The zombie is looking more corpsey.')
+            print(self.hurt)
         else:
-            print('The zombie shambles energetically.')
-    weapon = Weapon('gross hands', 1, 1)
-    def attack(self):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
-        print('The Zombie attacks with his {}, dealing {} damage.'.format(self.weapon.name, dmg))
-        return dmg
-
+            print(self.unhurt)
+            
 class Mimic(Character):
+    def __init__(self, name, hp, weapon):
+        self.unhurt = 'The mimic is still terrifying.'
+        self.hurt = 'The mimic looks pretty broken, but is still terrifying.'
+        super().__init__(name, hp, weapon)
+        
     def check_status(self):
         if self.hp/self.maxhp * 100 <= 50:
-            print('The mimic is still terrifying.')
+            print(self.hurt)
         else:
-            print('The mimic looks pretty broken, but is still terrifying.')
-    weapon = Weapon('Bite', 3, 4)
-    def attack(self):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
-        print('The Mimic attacks with his {}, dealing {} damage.'.format(self.weapon.name, dmg))
-        return dmg
-        
+            print(self.unhurt)
+            
 class Hobgoblin(Character):
+    def __init__(self, name, hp, weapon):
+        self.hurt = 'The Hobgoblin is looking a little more worried.'
+        self.unhurt = 'The Hobgoblin smirks.'
+        super().__init__(name, hp, weapon)
+        
     def check_status(self):
         if self.hp/self.maxhp * 100 <= 50:
-            print('The Hobgoblin smirks.')
+            print(self.hurt)
         else:
-            print('The Hobgoblin is looking a little more worried.')
-    weapon = Weapon('Sword', 3, 5)
-    def attack(self):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
-        print('The Hobgoblin attacks with his {}, dealing {} damage.'.format(self.weapon.name, dmg))
-        return dmg
-        
+            print(self.unhurt)   
+            
 def combat(player, enemy):
     player = player
     enemy = enemy
@@ -117,7 +119,7 @@ def combat(player, enemy):
         elif raw_input == "4":
             print('You run from the {}. You  are forever branded a coward'.format(enemy.name))
             print()
-            exit()
+            retire()
         else:
             print('Invalid input')
             continue
@@ -134,38 +136,36 @@ def combat(player, enemy):
                 
 def main():
     # keep track of all slain enemies
-    slain = dict(Goblin = 0, Mimic = 0, Zombie = 0, Hobgoblin = 0)
     print('A goblin attacks. Defend yourself!')
-    gob1 = Goblin('Goblin', 6)
+    gob1 = Goblin('Goblin', 6, Weapon('Dagger', 1, 2))
     combat(hero, gob1)
     slain['Goblin'] += 1
     while True:
         print('*'* 75)
         contin = input('Venture forth? (Y/N)').lower()
         if contin == 'y':
-            slain = venture(slain)
+            venture()
         elif contin == 'n':
-            retire(slain)
+            retire()
         else:
             print('Invalid entry')
  
-def venture(slain):
+def venture():
     print()
-    slain = slain
     quest = randint(1,100)
     if quest >= 1 and quest <= 33:
         print("It's another goblin! Defend yourself!")
-        gob = Goblin('Goblin', 8)
+        gob = Goblin('Goblin', 8, Weapon('Dagger', 1, 2))
         combat(hero, gob)
         slain['Goblin'] += 1
     elif quest >= 34 and quest <= 60:
         print("A shambling corpse approaches!")
-        zom = Zombie('Zombie', 12)
+        zom = Zombie('Zombie', 12, Weapon('gross hands', 1, 2))
         combat(hero, zom)
         slain['Zombie'] += 1
     elif quest >= 61 and quest <= 70:
         print("A big looking goblin attacks! Defeat him!")
-        gob = Goblin('Goblin', 10)
+        gob = Goblin('Goblin', 10, Weapon('Dagger', 1, 2))
         combat(hero, gob)
         slain['Goblin'] += 1
     elif quest >= 71 and quest <= 95:
@@ -179,7 +179,7 @@ def venture(slain):
             hero.potions += 2
         elif loot >= 16 and loot <= 19:
             print('The chest has teeth and it attacks! What sick bastard thought of this!?')
-            mim = Mimic('Mimic', 10)
+            mim = Mimic('Mimic', 10, Weapon('Bite', 3, 4))
             combat(hero, mim)
             slain['Mimic'] += 1
         else:
@@ -194,21 +194,19 @@ def venture(slain):
             
     elif quest >= 96 and quest <= 100:
         print("A menacing looking Hobgoblin attacks! Fight for you life!")
-        hob = Hobgoblin('Hobgoblin', 15)
+        hob = Hobgoblin('Hobgoblin', 15, Weapon('Sword', 3, 5))
         combat(hero, hob)
         slain['Hobgoblin'] += 1
-    return slain
     
-def retire(slain):
-    slain = slain
+def retire():
     print('\nFinal Tally:\n')
     for key, value in slain.items():
         print(key + ': '+ str(value))
     print('\n{} potions left'.format(hero.potions))
     score = 0
     score += slain['Goblin'] * 50
-    score += slain['Zombie'] * 40
-    score += slain['Mimic'] * 70
+    score += slain['Zombie'] * 60
+    score += slain['Mimic'] * 75
     score += slain['Hobgoblin'] * 100
     score += hero.potions * 30
     print()
@@ -218,6 +216,7 @@ def retire(slain):
     print('*' * (len(out) + 4))
     exit()
 
-hero = Hero('Hero', 12)
-
+hero = Hero('Hero', 12, Weapon('Sword', 3, 5))
+# keep track of all slain enemies
+slain = dict(Goblin = 0, Mimic = 0, Zombie = 0, Hobgoblin = 0)
 main()
