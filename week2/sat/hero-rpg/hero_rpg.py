@@ -1,97 +1,38 @@
 from random import *
-class Weapon:
-    def __init__(self, name, weapdmgmin, weapdmgmax):
-        self.name = name
-        self.weapdmgmin = weapdmgmin
-        self.weapdmgmax = weapdmgmax
-        
-class Character:
-    def __init__(self, name, hp, weapon):
-        self.name = name
-        self.hp = hp
-        self.maxhp = hp
-        self.weapon = weapon
-    def alive(self):
-        if self.hp < 1:
-            return False
-        else:
-            return True
-    def check_status(self):
-        print('{} has {} health left.'.format(self.name, self.hp))
-    def attack(self):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
-        print('{} attacks with it\'s {}, dealing {} damage.'.format(self.name, self.weapon.name, dmg))
-        return dmg
-        
-class Hero(Character):
-    potions = 3
-    def attack(self):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
-        print('You attack with your {}, dealing {} damage.'.format(self.weapon.name, dmg))
-        return dmg
-    def use_potion(self):
-        if self.potions < 1:
-            print('You out of potions! Oh no!')
-        else:
-            print('You chug a potion in the midst of combat! Ballsy.')
-            heal = randint(5, 8)
-            self.hp += heal
-            self.potions -= 1
-            print('It heals you for {}.'.format(heal))
-            print('You have {} potions left'.format(self.potions))
-            if self.hp > self.maxhp:
-                self.hp = self.maxhp
-            else:
-                pass
+import characters
 
-class Goblin(Character):
-    def __init__(self, name, hp, weapon):
-        self.hurt = 'The goblin is looking injured.'
-        self.unhurt = 'The goblin seems to be in good health.'
-        super().__init__(name, hp, weapon)
-    
-    def check_status(self):
-        if self.hp/self.maxhp * 100 <= 50:
-            print(self.hurt)
-        else:
-            print(self.unhurt)
-            
-class Zombie(Character):
-    def __init__(self, name, hp, weapon):
-        self.hurt = 'The zombie is looking more corpsey.'
-        self.unhurt = 'The zombie shambles energetically.'
-        super().__init__(name, hp, weapon)
-    
-    def check_status(self):
-        if self.hp/self.maxhp * 100 <= 50:
-            print(self.hurt)
-        else:
-            print(self.unhurt)
-            
-class Mimic(Character):
-    def __init__(self, name, hp, weapon):
-        self.unhurt = 'The mimic is still terrifying.'
-        self.hurt = 'The mimic looks pretty broken, but is still terrifying.'
-        super().__init__(name, hp, weapon)
+class Location:
+    def __init__(self, name):
+        self.name = name
+    places = []
+    def options(self):
+        while True:
+            for num, locale in enumerate(self.places):
+                print('{}.  {}'.format(num + 1, locale))
+            print('\n> ', end =' ')
+            choice = int(input())
         
-    def check_status(self):
-        if self.hp/self.maxhp * 100 <= 50:
-            print(self.hurt)
-        else:
-            print(self.unhurt)
-            
-class Hobgoblin(Character):
-    def __init__(self, name, hp, weapon):
-        self.hurt = 'The Hobgoblin is looking a little more worried.'
-        self.unhurt = 'The Hobgoblin smirks.'
-        super().__init__(name, hp, weapon)
-        
-    def check_status(self):
-        if self.hp/self.maxhp * 100 <= 50:
-            print(self.hurt)
-        else:
-            print(self.unhurt)   
-            
+            if choice in range(1, len(self.places) + 1):
+                return choice
+            else:
+                print('Invalid input')
+                continue
+    
+           
+class Town(Location):
+    def __init__(self, name, places, itemlist, special):
+        super().__init__(name)
+        self.places = places
+        self.itemlist = itemlist
+        self.special = special
+    
+    def go_to(self, locale):
+        pass
+    
+class Shop:
+    def __init__(self, itemlist):
+        self.itemlist = itemlist
+    
 def combat(player, enemy):
     player = player
     enemy = enemy
@@ -108,7 +49,7 @@ def combat(player, enemy):
         raw_input = input()
         print('*'* 75)
         if raw_input == "1":
-            dmg = player.attack()
+            dmg = player.attack(enemy)
             print()
             enemy.hp -= dmg
         elif raw_input == "2":
@@ -119,86 +60,131 @@ def combat(player, enemy):
         elif raw_input == "4":
             print('You run from the {}. You  are forever branded a coward'.format(enemy.name))
             print()
-            retire()
+            retire(True)
         else:
             print('Invalid input')
             continue
 
         if enemy.hp > 0:
             # Enemy attack
-            dmg = enemy.attack()
+            dmg = enemy.attack(player)
             player.hp -= dmg
             if player.hp <= 0:
                 print("You are dead.")
                 exit()
         else:
             print('You defeated the {}!'.format(enemy.name))
-                
+            hero.zenny += enemy.bounty
+
+def explore():
+    pass
+
 def main():
-    # keep track of all slain enemies
-    print('A goblin attacks. Defend yourself!')
-    gob1 = Goblin('Goblin', 6, Weapon('Dagger', 1, 2))
-    combat(hero, gob1)
-    slain['Goblin'] += 1
+    innsmouth = Town('Innsmouth', ['Shop', 'Training Ground', 'Leave'], 
+    ['Potion', 'Chainmail', 'Longsword'], ['Strength training', 'Evasion'])
+    x = innsmouth.options()
+    innsmouth.go_to(x - 1)
     while True:
         print('*'* 75)
-        contin = input('Venture forth? (Y/N)').lower()
-        if contin == 'y':
+        print('Zenny: {}'.format(hero.zenny))
+        print('Potions: {}'.format(hero.potions))
+        print("-" * 56)
+        print("| 1.Venture \t\t\t\t2.Go to town |")
+        print("| 3.Use potion     \t\t\t4.Retire       |")
+        print("-" * 56)
+        print("> ", end=' ')
+        raw_input = input()
+        if raw_input == '1':
             venture()
-        elif contin == 'n':
-            retire()
+        elif raw_input == '2':
+            pass
+        elif raw_input == '3':
+            hero.use_potion()
+            hero.check_status()
+        elif raw_input == '4':
+            retire(False)
         else:
-            print('Invalid entry')
- 
+            print('Invalid input')
+
+def common_encouter():
+    roll = randint(1, 100)
+    if roll in range(1, 51):
+        foe = characters.Goblin('Goblin', 7)
+        print('It\'s another goblin! Defend yourself!')
+        combat(hero, foe)
+        slain['Goblin'] += 1
+    elif roll in range(51, 101):
+        foe = characters.Zombie('Zombie', 10)
+        print('A shambling corpse approaches! You\'ve seen this movie.')
+        combat(hero, foe)
+        slain['Zombie'] += 1
+
+def uncommon_encounter():
+    roll = randint(1, 100)
+    if roll in range(1, 51):
+        foe = characters.Goblin('Goblin', 10)
+        print('A big looking goblin approaches! Attack!')
+        combat(hero, foe)
+        slain['Goblin'] += 1
+        
+    elif roll in range(51, 101):
+        foe = characters.Bandit('Bandit', 10)
+        print('A bandit jumps out from the shadows! Stay away from my loot!')
+        combat(hero, foe)
+        slain['Bandit'] += 1
+        
+def rare_encounter():
+    print('Uh oh. A menacing looking hobgoblin is coming.')
+    foe = characters.Hobgoblin('Hobgoblin', 15)
+    combat(hero, foe)
+    slain['Hobgoblin'] += 1
+
+def special_encounter():
+    pass
+
+def loot_roll():
+    input('A treasure chest! As you go to open it...')
+    loot = randint(1,20)
+    if loot in range(1, 11):
+            print('You found a potion. That\'ll come in handy.')
+            hero.potions += 1
+    elif loot in range(11, 16):
+            print('There\'s 2 potions! Lucky!')
+            hero.potions += 2
+    elif loot in range(16, 20):
+            print('The chest has teeth and it attacks! What sick bastard thought of this!?')
+            mim = characters.Mimic('Mimic', 10)
+            combat(hero, mim)
+            slain['Mimic'] += 1
+    else:
+        if hero.weapon.name != 'Excalibur':
+            print('A gleaming golden sword is in the chest. It looks far better than yours.')
+            print('Good thing anything left in chests is free for the taking! /Get!')
+            hero.weapon = Weapon('Excalibur', 6, 8)
+            print('You got Excalibur!')
+        else:
+            print('3 potions! Who is leaving these here?')
+            hero.potions += 3
+
 def venture():
     print()
     quest = randint(1,100)
-    if quest >= 1 and quest <= 33:
-        print("It's another goblin! Defend yourself!")
-        gob = Goblin('Goblin', 8, Weapon('Dagger', 1, 2))
-        combat(hero, gob)
-        slain['Goblin'] += 1
-    elif quest >= 34 and quest <= 60:
-        print("A shambling corpse approaches!")
-        zom = Zombie('Zombie', 12, Weapon('gross hands', 1, 2))
-        combat(hero, zom)
-        slain['Zombie'] += 1
-    elif quest >= 61 and quest <= 70:
-        print("A big looking goblin attacks! Defeat him!")
-        gob = Goblin('Goblin', 10, Weapon('Dagger', 1, 2))
-        combat(hero, gob)
-        slain['Goblin'] += 1
-    elif quest >= 71 and quest <= 95:
-        input('A treasure chest! As you go to open it...')
-        loot = randint(1,20)
-        if loot >=1 and loot <= 10:
-            print('You found a potion. That\'ll come in handy.')
-            hero.potions += 1
-        elif loot >= 11 and loot <= 15:
-            print('There\'s 2 potions! Lucky!')
-            hero.potions += 2
-        elif loot >= 16 and loot <= 19:
-            print('The chest has teeth and it attacks! What sick bastard thought of this!?')
-            mim = Mimic('Mimic', 10, Weapon('Bite', 3, 4))
-            combat(hero, mim)
-            slain['Mimic'] += 1
-        else:
-            if hero.weapon.name == 'Sword':
-                print('A gleaming golden sword is in the chest. It looks far better than yours.')
-                print('Good thing anything left in chests is free for the taking! /Get!')
-                hero.weapon = Weapon('Excalibur', 6, 8)
-                print('You got Excalibur!')
-            else:
-                print('3 potions! Who is leaving these here?')
-                hero.potions += 3
-            
-    elif quest >= 96 and quest <= 100:
-        print("A menacing looking Hobgoblin attacks! Fight for you life!")
-        hob = Hobgoblin('Hobgoblin', 15, Weapon('Sword', 3, 5))
-        combat(hero, hob)
-        slain['Hobgoblin'] += 1
+    if quest in range(1, 51):
+        common_encouter()
+        
+    elif quest in range(51, 71):
+        uncommon_encounter()
+        
+    elif quest in range(71, 91):
+        loot_roll()
+        
+    elif quest in range(91, 98):
+        rare_encounter()
+        
+    elif quest in range(98, 101):
+        pass
     
-def retire():
+def retire(flee):
     print('\nFinal Tally:\n')
     for key, value in slain.items():
         print(key + ': '+ str(value))
@@ -206,17 +192,23 @@ def retire():
     score = 0
     score += slain['Goblin'] * 50
     score += slain['Zombie'] * 60
-    score += slain['Mimic'] * 75
-    score += slain['Hobgoblin'] * 100
+    score += slain['Mimic'] * 70
+    score += slain['Hobgoblin'] * 150
+    score += slain['Bandit'] * 80
     score += hero.potions * 30
     print()
+    if flee == True:
+        print('-10% for cowardice')
+        score -= score * .1
+    else:
+        pass
     out = 'TOTAL SCORE: {}'.format(score)
     print('*' * (len(out) + 4))
     print('* ' + out + ' *')
     print('*' * (len(out) + 4))
     exit()
-
-hero = Hero('Hero', 12, Weapon('Sword', 3, 5))
+    
+hero = characters.Hero('Hero', 12)
 # keep track of all slain enemies
-slain = dict(Goblin = 0, Mimic = 0, Zombie = 0, Hobgoblin = 0)
+slain = dict(Goblin = 0, Mimic = 0, Zombie = 0, Bandit = 0, Hobgoblin = 0)
 main()
