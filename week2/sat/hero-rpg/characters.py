@@ -1,17 +1,13 @@
 from random import *
-
-class Weapon:
-    def __init__(self, name, weapdmgmin, weapdmgmax):
-        self.name = name
-        self.weapdmgmin = weapdmgmin
-        self.weapdmgmax = weapdmgmax
-        
+import equipment
+    
 class Character:
     def __init__(self, name, hp):
         self.name = name
         self.hp = hp
         self.maxhp = hp
-    weapon = None
+    weapon = equipment.Weapon()
+    armor = equipment.unArmored()
     def alive(self):
         if self.hp < 1:
             return False
@@ -20,8 +16,8 @@ class Character:
     def check_status(self):
         print('{} has {} health left.'.format(self.name, self.hp))
     def attack(self, target):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
-        dmg -= target.armor
+        dmg = self.weapon.weapon_damage()
+        dmg -= target.armor.defense()
         if dmg < 1:
             dmg = 1
         else:
@@ -31,19 +27,18 @@ class Character:
         
 class Hero(Character):
     potions = 3
-    weapon = Weapon('Sword', 3, 5)
+    weapon = equipment.Sword()
     zenny = 1
-    starting_armor = 1
-    armor = starting_armor
     starting_power = 0
     power = starting_power
+    armor = equipment.chainMail()
     def attack(self, target):
-        dmg = randint(self.weapon.weapdmgmin, self.weapon.weapdmgmax)
+        dmg = self.weapon.weapon_damage()
         crit = randint(1, 20)
         if crit == 20:
             dmg += self.power
             dmg *= 2
-            dmg -= target.armor
+            dmg -= target.armor.defense()
             if dmg < 1:
                 dmg = 1
             else:
@@ -51,7 +46,7 @@ class Hero(Character):
             print('You attack with your {}, it crits for {} damage!'.format(self.weapon.name, dmg))
         else:
             dmg += self.power
-            dmg -= target.armor
+            dmg -= target.armor.defense()
             if dmg < 1:
                 dmg = 1
             else:
@@ -91,34 +86,30 @@ class Enemy(Character):
 class Goblin(Enemy):
     hurt = 'The goblin is looking injured.'
     unhurt = 'The goblin seems to be in good health.'
-    weapon = Weapon('Dagger', 1, 2)
+    weapon = equipment.Dagger()
     bounty = 2
-    armor = 0
 
 class Zombie(Enemy):
     hurt = 'The zombie is looking more corpsey.'
     unhurt = 'The zombie shambles energetically.'
-    weapon = Weapon('Gross hands', 1, 2)
+    weapon = equipment.Dagger()
     bounty = 1
-    armor = 0
 
 class Bandit(Enemy):
     hurt = 'The bandit is questioning his life choices.'
     unhurt = 'The bandit seems eager to loot you.'
-    weapon = Weapon('Short Sword',2 ,4)
+    weapon = equipment.shortSword()
     bounty = 4
-    armor = 0
     
 class Mimic(Enemy):
     unhurt = 'The mimic is still terrifying.'
     hurt = 'The mimic looks pretty broken, but is still terrifying.'
-    weapon = Weapon('Bite', 3, 4)
+    weapon = equipment.shortSword()
     bounty = 5
-    armor = 0
     
 class Hobgoblin(Enemy):
     hurt = 'The Hobgoblin is looking a little more worried.'
     unhurt = 'The Hobgoblin smirks.'
-    weapon = Weapon('Sword', 3, 5) 
+    weapon = equipment.Sword() 
     bounty = 10
-    armor = 1
+    armor = equipment.chainMail()

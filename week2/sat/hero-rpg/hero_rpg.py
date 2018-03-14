@@ -1,5 +1,6 @@
 from random import *
 import characters
+import equipment
 
 class Location:
     def __init__(self, name):
@@ -160,7 +161,7 @@ def loot_roll():
         if hero.weapon.name != 'Excalibur':
             print('A gleaming golden sword is in the chest. It looks far better than yours.')
             print('Good thing anything left in chests is free for the taking! /Get!')
-            hero.weapon = Weapon('Excalibur', 6, 8)
+            hero.weapon = equipment.Excalibur()
             print('You got Excalibur!')
         else:
             print('3 potions! Who is leaving these here?')
