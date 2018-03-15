@@ -8,13 +8,16 @@ class Character:
         self.maxhp = hp
     weapon = equipment.Weapon()
     armor = equipment.unArmored()
+    evasion = 0
     def alive(self):
         if self.hp < 1:
             return False
         else:
             return True
+            
     def check_status(self):
         print('{} has {} health left.'.format(self.name, self.hp))
+        
     def attack(self, target):
         dmg = self.weapon.weapon_damage()
         dmg -= target.armor.defense()
@@ -22,8 +25,25 @@ class Character:
             dmg = 1
         else:
             pass
-        print('{} attacks with it\'s {}, dealing {} damage.'.format(self.name, self.weapon.name, dmg))
-        return dmg
+        miss = target.dodge() 
+        if miss == True:
+            print('{} attacks with it\'s {}, you dodge it!'.format(self.name, self.weapon.name))
+            return 0
+        else:
+            print('{} attacks with it\'s {}, dealing {} damage.'.format(self.name, self.weapon.name, dmg))
+            return dmg
+        
+    def dodge(self):
+        try:
+            miss = (self.evasion * 40)/(self.evasion * 40) + self.evasion
+        except ZeroDivisionError:
+            miss = 0
+        miss = round(miss)
+        roll = randint(1, 100)
+        if roll in range(0, miss + 1):
+            return True
+        else:
+            return False
         
 class Hero(Character):
     potions = 3
@@ -31,10 +51,13 @@ class Hero(Character):
     zenny = 1
     starting_power = 0
     power = starting_power
-    armor = equipment.chainMail()
+    staring_evasion = 0
+    evasion = staring_evasion
+    armor = equipment.unArmored()
     def attack(self, target):
         dmg = self.weapon.weapon_damage()
         crit = randint(1, 20)
+        print('You attack with your {},'.format(self.weapon.name), end = ' ')
         if crit == 20:
             dmg += self.power
             dmg *= 2
@@ -43,7 +66,13 @@ class Hero(Character):
                 dmg = 1
             else:
                 pass
-            print('You attack with your {}, it crits for {} damage!'.format(self.weapon.name, dmg))
+            miss = target.dodge() 
+            if miss == True:
+                print('and miss!')
+                return 0
+            else:
+                print('it crits for {} damage!'.format(dmg))
+                return dmg
         else:
             dmg += self.power
             dmg -= target.armor.defense()
@@ -51,8 +80,13 @@ class Hero(Character):
                 dmg = 1
             else:
                 pass
-            print('You attack with your {}, dealing {} damage.'.format(self.weapon.name, dmg))
-        return dmg
+            miss = target.dodge() 
+            if miss == True:
+                print('and miss!')
+                return 0
+            else:
+                print('dealing {} damage.'.format(dmg))
+                return dmg
         
     def use_potion(self):
         if self.potions < 1:

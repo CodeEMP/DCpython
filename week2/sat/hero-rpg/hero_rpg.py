@@ -8,17 +8,18 @@ class Location:
     places = []
     def options(self):
         while True:
-            for num, locale in enumerate(self.places):
-                print('{}.  {}'.format(num + 1, locale))
-            print('\n> ', end =' ')
-            choice = int(input())
-        
-            if choice in range(1, len(self.places) + 1):
-                return choice
-            else:
-                print('Invalid input')
-                continue
-    
+            try:
+                print('\n' + '*' * 75)
+                print('{} : Go where?\n'.format(self.name))
+                for num, locale in enumerate(self.places):
+                    print('| {}.  {}'.format(num + 1, locale))
+                print('\n> ', end =' ')
+                choice = int(input())
+                if choice in range(1, len(self.places) + 1):
+                    return choice
+            except IndexError:
+                print('Invalid input.')
+                
            
 class Town(Location):
     def __init__(self, name, places, itemlist, special):
@@ -28,11 +29,96 @@ class Town(Location):
         self.special = special
     
     def go_to(self, locale):
-        pass
+        while True:
+            if self.places[locale - 1] == 'Leave':
+                break
+            elif self.places[locale - 1] == 'Shop':
+                print('\n' + '*' * 75)
+                print('Welcome to the {} Item shop! What would you like to buy?'.format(self.name))
+                print('\nZenny: {}'.format(hero.zenny))
+                print('Potions: {}\n'.format(hero.potions))
+                shop = Shop(self.itemlist)
+                shop.selection()
+                locale = self.options()
+            elif self.places[locale - 1] == 'Training Ground':
+                print('Welcome to the {} Training Ground! Here are our courses.'.format(self.name))
+                print('\nZenny: {}'.format(hero.zenny))
+                print('Potions: {}\n'.format(hero.potions))
+                shop = Shop(self.special)
+                shop.selection()
+                locale = self.options()
+        
     
 class Shop:
     def __init__(self, itemlist):
         self.itemlist = itemlist
+    def selection(self):
+        while True:
+            try:
+                for num, item in enumerate(self.itemlist):
+                    print('{}. {}'.format(num + 1, item), end ='\t')
+                print('\n> ')
+                choice = int(input())
+                if self.itemlist[choice - 1] == 'Leave':
+                    print('Thanks for coming by.')
+                    break
+                else:
+                    self.buy(self.itemlist[choice - 1])
+            except IndexError:
+                print('Invalid input.')
+   
+    def buy(self, item):
+        if item == 'Potion':
+            if hero.zenny < 5:
+                print('Not enough zenny. Cost 5\n')
+            else:
+                hero.zenny -= 5
+                hero.potions =+ 1
+                print('Thanks!\nYou got a Potion!\n')
+        elif item == 'Chainmail':
+            if hero.zenny < 30:
+                print('Not enough zenny. Cost 30\n')
+            elif hero.armor.name == 'Chainmail':
+                print('You already have that!\n')
+            elif hero.armor.armor > 1:
+                print('The armor you have is better.\n')
+            else:
+                hero.zenny -= 30
+                hero.armor = equipment.chainMail()
+                print('Thanks\nYou got Chainmail!\n')
+                
+        elif item == 'Longsword':
+            if hero.zenny < 25:
+                print('Not enough zenny. Cost 25')
+            elif hero.armor.name == 'Longsword':
+                print('You already have that!\n')
+            elif hero.weapon.weapdmgmax > 6:
+                print('The armor you have is better.\n')
+            else:
+                hero.zenny -= 25
+                hero.weapon = equipment.longSword()
+                print('Thanks!\nYou got a Longsword!\n')
+                
+        elif item == 'Strength training':
+            if hero.power >= hero.starting_power + 2:
+                print('You\'ve trained your strength to the max.\n')
+            elif hero.zenny < 25:
+                print('Not enough zenny. Cost 25')
+            else:
+                hero.zenny -= 25
+                print('You feel stronger! Gained 1 power!')
+                hero.power += 1
+        
+        elif item == 'Evasion':
+            if hero.power >= hero.starting_power + 4:
+                print('You\'ve trained your Evasion to the max.\n')
+            elif hero.zenny < 35:
+                print('Not enough zenny. Cost 35')
+            else:
+                hero.zenny -= 35
+                print('You feel more agile!')
+                hero.evasion += 1
+     
     
 def combat(player, enemy):
     player = player
@@ -77,20 +163,15 @@ def combat(player, enemy):
             print('You defeated the {}!'.format(enemy.name))
             hero.zenny += enemy.bounty
 
-def explore():
-    pass
-
 def main():
     innsmouth = Town('Innsmouth', ['Shop', 'Training Ground', 'Leave'], 
-    ['Potion', 'Chainmail', 'Longsword'], ['Strength training', 'Evasion'])
-    x = innsmouth.options()
-    innsmouth.go_to(x - 1)
+    ['Leave', 'Potion', 'Chainmail', 'Longsword'], ['Leave', 'Strength training', 'Evasion'])
     while True:
         print('*'* 75)
         print('Zenny: {}'.format(hero.zenny))
         print('Potions: {}'.format(hero.potions))
         print("-" * 56)
-        print("| 1.Venture \t\t\t\t2.Go to town |")
+        print("| 1.Venture \t\t\t\t2.Go to town   |")
         print("| 3.Use potion     \t\t\t4.Retire       |")
         print("-" * 56)
         print("> ", end=' ')
@@ -98,7 +179,8 @@ def main():
         if raw_input == '1':
             venture()
         elif raw_input == '2':
-            pass
+            place = innsmouth.options()
+            innsmouth.go_to(place)
         elif raw_input == '3':
             hero.use_potion()
             hero.check_status()
