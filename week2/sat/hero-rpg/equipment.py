@@ -32,6 +32,11 @@ class Excalibur(Weapon):
     name = 'Excalibur'
     weapdmgmin = 6
     weapdmgmax = 8
+
+class Bite(Weapon):
+    name = 'Bite'
+    weapdmgmin = 3
+    weapdmgmax = 4
     
 class Armor:
     name = None

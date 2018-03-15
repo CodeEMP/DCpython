@@ -20,7 +20,6 @@ class Location:
             except IndexError:
                 print('Invalid input.')
                 
-           
 class Town(Location):
     def __init__(self, name, places, itemlist, special):
         super().__init__(name)
@@ -48,7 +47,6 @@ class Town(Location):
                 shop.selection()
                 locale = self.options()
         
-    
 class Shop:
     def __init__(self, itemlist):
         self.itemlist = itemlist
@@ -63,6 +61,7 @@ class Shop:
                     print('Thanks for coming by.')
                     break
                 else:
+                    print('\n' + '*' * 75)
                     self.buy(self.itemlist[choice - 1])
             except IndexError:
                 print('Invalid input.')
@@ -89,7 +88,7 @@ class Shop:
                 
         elif item == 'Longsword':
             if hero.zenny < 25:
-                print('Not enough zenny. Cost 25')
+                print('Not enough zenny. Cost 25\n')
             elif hero.armor.name == 'Longsword':
                 print('You already have that!\n')
             elif hero.weapon.weapdmgmax > 6:
@@ -103,23 +102,22 @@ class Shop:
             if hero.power >= hero.starting_power + 2:
                 print('You\'ve trained your strength to the max.\n')
             elif hero.zenny < 25:
-                print('Not enough zenny. Cost 25')
+                print('Not enough zenny. Cost 25\n')
             else:
                 hero.zenny -= 25
-                print('You feel stronger! Gained 1 power!')
+                print('You feel stronger! Gained 1 power!\n')
                 hero.power += 1
         
         elif item == 'Evasion':
             if hero.power >= hero.starting_power + 4:
                 print('You\'ve trained your Evasion to the max.\n')
             elif hero.zenny < 35:
-                print('Not enough zenny. Cost 35')
+                print('Not enough zenny. Cost 35\n')
             else:
                 hero.zenny -= 35
-                print('You feel more agile!')
+                print('You feel more agile!\n')
                 hero.evasion += 1
      
-    
 def combat(player, enemy):
     player = player
     enemy = enemy
@@ -182,6 +180,7 @@ def main():
             place = innsmouth.options()
             innsmouth.go_to(place)
         elif raw_input == '3':
+            print('*' * 75)
             hero.use_potion()
             hero.check_status()
         elif raw_input == '4':

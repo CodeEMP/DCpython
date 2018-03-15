@@ -92,7 +92,6 @@ class Hero(Character):
         if self.potions < 1:
             print('You out of potions! Oh no!')
         else:
-            print('You chug a potion in the midst of combat! Ballsy.')
             heal = randint(5, 8)
             self.hp += heal
             self.potions -= 1
@@ -138,7 +137,7 @@ class Bandit(Enemy):
 class Mimic(Enemy):
     unhurt = 'The mimic is still terrifying.'
     hurt = 'The mimic looks pretty broken, but is still terrifying.'
-    weapon = equipment.shortSword()
+    weapon = equipment.Bite()
     bounty = 5
     
 class Hobgoblin(Enemy):
