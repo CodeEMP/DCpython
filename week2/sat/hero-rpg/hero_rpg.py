@@ -109,7 +109,7 @@ class Shop:
                 hero.power += 1
         
         elif item == 'Evasion':
-            if hero.power >= hero.starting_power + 4:
+            if hero.evasion >= hero.staring_evasion + 10:
                 print('You\'ve trained your Evasion to the max.\n')
             elif hero.zenny < 35:
                 print('Not enough zenny. Cost 35\n')
